@@ -16,9 +16,9 @@ public class Main {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		File file = new File(".");
-		System.out.println(file.getCanonicalFile());
-		System.out.println(file.getRelativeFile() );
+		System.out.println(new File("foo"));
+		
+		
 		
 	}
 

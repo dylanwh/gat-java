@@ -19,11 +19,10 @@ public class File extends java.io.File implements Serializable {
 	}
 
 	public File getRelativeFile() throws IOException {
-		return this.getRelativeFile(new File().getAbsoluteFile());
+		return this.getRelativeFile(new File());
 	}
 	
 	public File getRelativeFile(File dir) throws IOException {
-		
 		return null;
 	}
 
