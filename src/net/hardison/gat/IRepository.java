@@ -1,5 +1,7 @@
 package net.hardison.gat;
 
+import java.io.IOException;
+
 /** Repository Interface
  * 
  * @author Dylan William Hardison <dylan@hardison.net>
@@ -28,9 +30,10 @@ public interface IRepository {
 	/** Remove an asset from the Repository
 	 * 
 	 * @param asset the asset to remove
+	 * @return true if the asset was removed, false otherwise.
 	 * @throws RepositoryException
 	 */
-	void  purge(Asset asset) throws RepositoryException;
+	boolean  purge(Asset asset) throws RepositoryException;
 	
 	/** Attach an asset to a file
 	 * This is a no-op if isAttached(file, asset) would return true.
@@ -46,9 +49,10 @@ public interface IRepository {
 	 * Typically this would just be a file.delete();
 	 * @param file
 	 * @param asset
+	 * @return 
 	 * @throws RepositoryException
 	 */
-	void detach(File file, Asset asset) throws RepositoryException;
+	boolean detach(File file, Asset asset) throws RepositoryException;
 	
 	/** Return a unique file, which references a writable file.
 	 * This function is intended to allow one to edit entities in the repository.
@@ -56,8 +60,9 @@ public interface IRepository {
 	 * @param asset
 	 * @return a file which is only guaranteed to exist until Repository.close() time.
 	 * @throws RepositoryException
+	 * @throws IOException 
 	 */
- 	File clone(Asset asset) throws RepositoryException;
+ 	File clone(Asset asset) throws RepositoryException, IOException;
  	
  	/** Test the attachment between an arbitrary file and an asset.
  	 * 

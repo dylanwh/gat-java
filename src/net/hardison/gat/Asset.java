@@ -6,7 +6,7 @@ import java.util.Date;
 public class Asset implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
-	private byte[] checksum = {'c'};
+	private String checksum = "foo";
 	private int size = 0;
 	private Date mtime = null;
 	private String content_type = "";
@@ -14,7 +14,7 @@ public class Asset implements Serializable {
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
-	public byte[] getChecksum() {
+	public String getChecksum() {
 		return checksum;
 	}
 	public int getSize() {

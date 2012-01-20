@@ -17,13 +17,9 @@ public class File extends java.io.File implements Serializable {
 	public File(java.io.File file) {
 		super(file.getPath());
 	}
-
-	public File getRelativeFile() throws IOException {
-		return this.getRelativeFile(new File());
-	}
 	
-	public File getRelativeFile(File dir) throws IOException {
-		return null;
+	public File(String parent, String child) {
+		super(parent, child);
 	}
 
 	@Override
@@ -36,5 +32,14 @@ public class File extends java.io.File implements Serializable {
 	public File getCanonicalFile() throws IOException {
 		// TODO Auto-generated method stub
 		return new File(super.getCanonicalFile());
+	}
+
+	public File file(File file) {
+		return new File(this.getPath(), file.getPath());
+	}
+
+	public void copy(File dest) {
+		// TODO Auto-generated method stub
+		
 	}
 } 
