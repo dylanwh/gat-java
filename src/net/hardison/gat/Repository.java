@@ -7,8 +7,7 @@ public abstract class Repository implements IRepository {
 	private File tempDirectory = null;
 	private boolean opened = false;
 
-	
-	private File getAssetFile(Asset asset) {
+	protected File getAssetFile(Asset asset) {
 		return new File(getAssetDirectory().getPath(), asset.getChecksum());
 	}
 
