@@ -18,5 +18,10 @@ public class Label implements Serializable {
 	private void setName(String val) {
 		name = val;
 	}
+
+	@Override
+	public String toString() {
+		return "Label [" + name + "]";
+	}
 	
 }

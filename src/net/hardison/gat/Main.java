@@ -1,6 +1,8 @@
 package net.hardison.gat;
 
 import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
 
 /*import java.util.HashMap;
 import java.util.Map;
@@ -16,9 +18,11 @@ public class Main {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		System.out.println(new File("foo"));
+		Path base = FileSystems.getDefault().getPath("/home/dylan");
+		Path file = FileSystems.getDefault().getPath("..").toAbsolutePath().normalize();
+		System.out.println(base.relativize(file));
 		
-		
+	
 		
 	}
 

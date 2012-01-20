@@ -1,76 +1,90 @@
 package net.hardison.gat;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public abstract class Repository implements IRepository {
-	private File assetDirectory = null;
-	private File tempDirectory = null;
+	private AssetFactory assetFactory = null;
+	private Path assetDirectory = null;
+	private Path tempDirectory = null;
 	private boolean opened = false;
 
-	protected File getAssetFile(Asset asset) {
-		return new File(getAssetDirectory().getPath(), asset.getChecksum());
+	protected Path getAssetFile(Asset asset) {
+		return assetDirectory.resolve(asset.getChecksum());
 	}
 
 	@Override
-	public void open() {
+	public void open() throws IOException {
 		// TODO Auto-generated method stub
 		this.setOpened(true);
+		Files.createDirectories(assetDirectory);
+		Files.createDirectories(tempDirectory);
 	}
 	
 	@Override
-	public abstract Asset store(File file) throws RepositoryException;
-
-	@Override
-	public boolean purge(Asset asset) throws RepositoryException {
+	public Asset store(Path file) throws RepositoryException, IOException {
 		assertOpened();
 		
-		File assetFile = getAssetFile(asset);
-		return assetFile.delete();
+		Asset asset = assetFactory.makeAsset(file);
+		if (asset == null)
+			throw new RepositoryException("AssetFactory returned null!");
+		
+		store(file, asset);
+		return asset;
+	}
+
+	abstract void store(Path file, Asset asset) throws RepositoryException, IOException;
+
+	@Override
+	public boolean purge(Asset asset) throws RepositoryException, IOException {
+		assertOpened();
+		
+		Path assetFile = getAssetFile(asset);
+		return Files.deleteIfExists(assetFile);
 	}
 
 	@Override
-	public abstract void attach(File file, Asset asset) throws RepositoryException;
+	public abstract void attach(Path file, Asset asset) throws RepositoryException, IOException;
 
 	@Override
-	public boolean detach(File file, Asset asset) throws RepositoryException {
+	public boolean detach(Path file, Asset asset) throws RepositoryException, IOException {
 		assertOpened();
 		
 		if (isAttached(file, asset))
-			return file.delete();
+			return Files.deleteIfExists(file);
 		else
 			return false;
 	}
 
 	@Override
-	public File clone(Asset asset) throws RepositoryException, IOException {
+	public Path clone(Asset asset) throws RepositoryException, IOException {
 		assertOpened();
-		File tempFile = new File(File.createTempFile("temp", ".asset", getTempDirectory()));
-		File assetFile = getAssetFile(asset);
-		assetFile.copy(tempFile);
-		tempFile.deleteOnExit();
+		Path tempFile = Files.createTempFile(tempDirectory, "gat", ".asset");
+		Path assetFile = getAssetFile(asset);
+		Files.copy(assetFile, tempFile);
 		return tempFile;
 	}
 
 	@Override
-	public abstract boolean isAttached(File file, Asset asset);
+	public abstract boolean isAttached(Path file, Asset asset);
 
 	@Override
 	public boolean isStored(Asset asset) {
-		File assetFile = getAssetFile(asset);
-		return assetFile.exists();
+		Path assetFile = getAssetFile(asset);
+		return Files.exists(assetFile);
 	}
 
 	@Override
 	public void close() throws RepositoryException {
-		// TODO Auto-generated method stub
-
+		setOpened(false);
 	}
 
-	public File getAssetDirectory() {
+	public Path getAssetDirectory() {
 		return assetDirectory;
 	}
 
-	public void setAssetDirectory(File assetDirectory) {
+	public void setAssetDirectory(Path assetDirectory) {
 		this.assetDirectory = assetDirectory;
 	}
 
@@ -87,12 +101,20 @@ public abstract class Repository implements IRepository {
 			throw new RepositoryException("repository is not opened!");
 	}
 
-	public File getTempDirectory() {
+	public Path getTempDirectory() {
 		return tempDirectory;
 	}
 
-	public void setTempDirectory(File tempDirectory) {
+	public void setTempDirectory(Path tempDirectory) {
 		this.tempDirectory = tempDirectory;
+	}
+
+	public AssetFactory getAssetFactory() {
+		return assetFactory;
+	}
+
+	public void setAssetFactory(AssetFactory assetFactory) {
+		this.assetFactory = assetFactory;
 	}
 
 }
