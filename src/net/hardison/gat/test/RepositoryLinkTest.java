@@ -31,7 +31,7 @@ public class RepositoryLinkTest {
 		repo.setAssetFactory(new AssetFactory());
 		repo.setTempDirectory(fs.getPath("test/tmp"));
 		repo.setAssetDirectory(fs.getPath("test/asset"));
-		repo.open();
+		repo.create();
 	}
 
 	@After
@@ -44,6 +44,7 @@ public class RepositoryLinkTest {
 		OutputStream stream = Files.newOutputStream(file);
 		String msg          = "hello, world";
 		stream.write(msg.getBytes());
+		stream.close();
 		
 		Asset asset = repo.store(file);
 		assertFalse(Files.exists(file));

@@ -16,7 +16,7 @@ public class RepositoryLink extends Repository implements IRepository {
 	@Override
 	public void attach(Path file, Asset asset) throws RepositoryException, IOException {
 		Path assetFile = getAssetFile(asset);
-		Files.createSymbolicLink(file, file.getParent().relativize(assetFile));
+		Files.createLink(file, assetFile);
 	}
 
 	@Override

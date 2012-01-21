@@ -29,14 +29,22 @@ public interface IRepository {
 	 * @throws IOException 
 	 */
  	Path clone(Asset asset) throws RepositoryException, IOException;
+ 	
+ 	/**
+ 	 * This should be called before any operations (except create).
+ 	 * @throws RepositoryException
+ 	 * @throws IOException
+ 	 */
+ 	void open() throws RepositoryException, IOException;
 	
 	/** Perform cleanup (if needed).
 	 * this may be implemented as a no-op.
 	 * Nevertheless, this must be called before the object goes out of scope.
 	 * No other method should be called after the repository is closed.
 	 * @throws RepositoryException
+	 * @throws IOException 
 	 */
-	void close() throws RepositoryException;
+	void close() throws RepositoryException, IOException;
 	
 	/** Remove the attachment from file to asset.
 	 * Typically this would just be a file.delete();
@@ -71,7 +79,7 @@ public interface IRepository {
 	 * where file is the file to the repository's store.
  	 * @throws IOException 
 	 */
-	void open() throws IOException;
+	void create() throws IOException;
 	
 	/** Remove an asset from the Repository
 	 * 

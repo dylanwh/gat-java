@@ -3,28 +3,49 @@ package net.hardison.gat;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 
 public abstract class Repository implements IRepository {
 	private AssetFactory assetFactory = null;
 	private Path assetDirectory = null;
 	private Path tempDirectory = null;
+	private ArrayList<Path> cloneFiles = null;
 	private boolean opened = false;
 
 	protected Path getAssetFile(Asset asset) {
-		return assetDirectory.resolve(asset.getChecksum());
+		return assetDirectory.resolve(asset.toString());
 	}
 
 	@Override
-	public void open() throws IOException {
-		// TODO Auto-generated method stub
-		this.setOpened(true);
+	public void create() throws IOException {
+		assert assetDirectory != null;
+		assert tempDirectory != null;
+		
 		Files.createDirectories(assetDirectory);
 		Files.createDirectories(tempDirectory);
 	}
 	
 	@Override
+	public void open() {
+		opened = true;
+		this.cloneFiles = new ArrayList<Path>();
+	}
+	
+	@Override
+	public void close() throws RepositoryException, IOException {
+		assert opened;
+		
+		for (Path path: cloneFiles) {
+			Files.deleteIfExists(path);
+		}
+		
+		opened = false;
+	}
+	
+	
+	@Override
 	public Asset store(Path file) throws RepositoryException, IOException {
-		assertOpened();
+		assert opened;
 		
 		Asset asset = assetFactory.makeAsset(file);
 		if (asset == null)
@@ -38,7 +59,7 @@ public abstract class Repository implements IRepository {
 
 	@Override
 	public boolean purge(Asset asset) throws RepositoryException, IOException {
-		assertOpened();
+		assert opened;
 		
 		Path assetFile = getAssetFile(asset);
 		return Files.deleteIfExists(assetFile);
@@ -49,7 +70,7 @@ public abstract class Repository implements IRepository {
 
 	@Override
 	public boolean detach(Path file, Asset asset) throws RepositoryException, IOException {
-		assertOpened();
+		assert opened;
 		
 		if (isAttached(file, asset))
 			return Files.deleteIfExists(file);
@@ -59,7 +80,7 @@ public abstract class Repository implements IRepository {
 
 	@Override
 	public Path clone(Asset asset) throws RepositoryException, IOException {
-		assertOpened();
+		assert opened;
 		Path tempFile = Files.createTempFile(tempDirectory, "gat", ".asset");
 		Path assetFile = getAssetFile(asset);
 		Files.copy(assetFile, tempFile);
@@ -75,30 +96,12 @@ public abstract class Repository implements IRepository {
 		return Files.exists(assetFile);
 	}
 
-	@Override
-	public void close() throws RepositoryException {
-		setOpened(false);
-	}
-
 	public Path getAssetDirectory() {
 		return assetDirectory;
 	}
 
 	public void setAssetDirectory(Path assetDirectory) {
 		this.assetDirectory = assetDirectory;
-	}
-
-	public boolean isOpened() {
-		return opened;
-	}
-
-	private void setOpened(boolean opened) {
-		this.opened = opened;
-	}
-	
-	private void assertOpened() throws RepositoryException {
-		if (!isOpened())
-			throw new RepositoryException("repository is not opened!");
 	}
 
 	public Path getTempDirectory() {
