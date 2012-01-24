@@ -3,43 +3,32 @@ package net.hardison.gat;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 
-import jdbm.InverseHashView;
 import jdbm.PrimaryHashMap;
 import jdbm.PrimaryStoreMap;
-import jdbm.PrimaryTreeMap;
 import jdbm.RecordManager;
 import jdbm.RecordManagerFactory;
 import jdbm.SecondaryHashMap;
 import jdbm.SecondaryKeyExtractor;
-import jdbm.SecondaryTreeMap;
 
 public class Model {
 
 	private Path databaseDirectory = null;
 	private RecordManager recMan = null;
-	private PrimaryStoreMap<Long,Link> links = null;
-	private InverseHashView<Long,Link> linksInverse = null;
-	private SecondaryHashMap<Label,Long,Link>  linksByLabel = null;
-	private SecondaryHashMap<Name,Long,Link> linksByName = null;
+	private PrimaryHashMap<Name,HashSet<Label>> links = null;
+	private SecondaryHashMap<Label,Name,HashSet<Label>> linksByLabel = null;
 	
-	private SecondaryKeyExtractor<Iterable<Label>,Long,Link> indexLabel = 
-			new SecondaryKeyExtractor<Iterable<Label>, Long, Link>() {
+	private SecondaryKeyExtractor<Iterable<Label>,Name,HashSet<Label>> indexLabel = 
+			new SecondaryKeyExtractor<Iterable<Label>, Name, HashSet<Label>>() {
 		@Override
-		public Iterable<Label> extractSecondaryKey(Long key, Link link) {
-			return link.getLabels();
+		public Iterable<Label> extractSecondaryKey(Name key, HashSet<Label> labels) {
+			return Collections.unmodifiableSet(labels);
 		}
 	};
-	
-	private SecondaryKeyExtractor<Name,Long,Link> indexName = 
-			new SecondaryKeyExtractor<Name, Long, Link>() {
-		@Override
-		public Name extractSecondaryKey(Long key, Link link) {
-			return link.getName();
-		}
-	};
-	
+
 	public void create() throws IOException {
 		assert databaseDirectory != null;
 		Files.createDirectories(databaseDirectory);
@@ -49,32 +38,18 @@ public class Model {
 		if (recMan == null) {
 			recMan = RecordManagerFactory.createRecordManager(
 					databaseDirectory.resolve("gat.db").toString());
-			links           = recMan.storeMap("links");
-			linksInverse    = links.inverseHashView("linksInverse");
+			links           = recMan.hashMap("links");
 			linksByLabel    = links.secondaryHashMapManyToOne("linksByLabel", indexLabel);
-			linksByName     = links.secondaryHashMap("linksByName", indexName);
 		}
 	}
 
 	public void close() throws IOException {
 		links = null;
-		linksInverse = null;
 		linksByLabel = null;
-		linksByName  = null;
 		recMan.close();
 		recMan = null;
 	}
 	
-	public void insertLink(Link link) {
-		Long id = linksInverse.findKeyForValue(link);
-		if (id == null) {
-			links.putValue(link);
-		}
-		else {
-			links.put(id, link);
-		}
-	}
-
 	public Path getDatabaseDirectory() {
 		return databaseDirectory;
 	}
@@ -83,27 +58,35 @@ public class Model {
 		databaseDirectory = value;
 	}
 
-	public Link getLink(Label label) {
-		Iterator<Link> iter = linksByLabel.getPrimaryValues(label).iterator();
-		if (iter.hasNext()) {
-			Link link = iter.next();
-			assert !iter.hasNext(): "only one";
-			return link;
-		}
-		else {
+	public Name getName(Label label) throws IOException {
+		Iterable<Name> names = linksByLabel.get(label);
+		if (names == null)
+			throw new IOException("foo");
+		
+		Iterator<Name> iter  = names.iterator();
+		if (!iter.hasNext())
 			return null;
-		}
+
+		Name name = iter.next();
+		assert !iter.hasNext(): "unique";
+		return name;
 	}
 	
-	public Link getLink(Name name) {
-		Iterator<Link> iter = linksByName.getPrimaryValues(name).iterator();
-		if (iter.hasNext()) {
-			Link link = iter.next();
-			assert !iter.hasNext(): "only one";
-			return link;
-		}
-		else {
-			return null;
-		}
+	public HashSet<Label> getLabels(Name name) {
+		return links.get(name);
 	}
+
+	public void bind(Label label, Name name) throws IOException {
+		HashSet<Label> labels = links.find(name);
+		if (labels == null) {
+			System.out.println("is null");
+			labels = new HashSet<Label>();
+		}
+
+		labels.add(label);
+		links.put(name, labels);
+		System.out.println(labels);
+		recMan.commit();
+	}
+
 }

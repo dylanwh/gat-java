@@ -37,7 +37,14 @@ public class ModelTest extends BaseTest {
 		m.create();
 		m.open();
 		
-		
+		Name name = new Name("d41d8cd98f00b204e9800998ecf8427e");
+		Label foo = new Label("foo");
+		Label bar = new Label("bar");
+		m.bind(foo, name);
+		m.bind(bar, name);
+
+		assertEquals(name, m.getName(foo));
+		//assertEquals(name, m.getName(bar));
 		
 		m.close();
 	}
