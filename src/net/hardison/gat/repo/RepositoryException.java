@@ -1,4 +1,4 @@
-package net.hardison.gat;
+package net.hardison.gat.repo;
 
 /** Base class for Repository-spawned errors.
  * 
