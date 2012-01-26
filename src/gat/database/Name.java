@@ -1,6 +1,8 @@
-package net.hardison.gat;
+package gat.database;
 
 import java.io.Serializable;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
 import java.util.Arrays;
 
 import org.apache.commons.codec.DecoderException;
@@ -52,5 +54,10 @@ public class Name implements Serializable {
 		if (!Arrays.equals(this.bytes, other.bytes))
 			return false;
 		return true;
+	}
+
+	public Path toPath() {
+		String name = toString();
+		return FileSystems.getDefault().getPath(name.substring(0,2), name.substring(2));
 	}
 }

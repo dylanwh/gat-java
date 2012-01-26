@@ -1,7 +1,6 @@
-package net.hardison.gat;
+package gat.database;
 
 import java.io.Serializable;
-import java.util.Map;
 
 public class Label implements Serializable, Comparable<Label> {
 	private static final long serialVersionUID = 1L;

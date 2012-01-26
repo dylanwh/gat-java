@@ -1,9 +1,10 @@
-package net.hardison.gat;
+package gat.repository;
+
+import gat.database.Name;
 
 import java.io.IOException;
 import java.nio.file.Path;
 
-import net.hardison.gat.repo.RepositoryException;
 
 
 /** Repository Interface
@@ -82,7 +83,7 @@ public interface Repository<A extends Asset> {
 	 * where file is the file to the repository's store.
  	 * @throws IOException 
 	 */
-	void create() throws IOException;
+	void init() throws IOException;
 	
 	/** Remove an asset from the Repository
 	 * 
@@ -106,6 +107,6 @@ public interface Repository<A extends Asset> {
 	 */
 	A store(Path file) throws RepositoryException, IOException;
 	
-	A fetch(Name name);
+	A fetch(Name name) throws RepositoryException, IOException;
 	
 }
