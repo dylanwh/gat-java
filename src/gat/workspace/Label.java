@@ -1,37 +1,36 @@
-package gat.database;
+package gat.workspace;
 
 import java.io.Serializable;
 
 public class Label implements Serializable, Comparable<Label> {
 	private static final long serialVersionUID = 1L;
 	
-	private String name = null;
+	private String value = null;
 
-	
-	public Label(String name) {
-		assert name != null: "name";
+	Label(String value) {
+		assert value != null: "value";
 		
-		setName(name);
+		setValue(value);
 	}
 
-	public String getName() {
-		return name;
+	public String getValue() {
+		return value;
 	}
 
-	private void setName(String val) {
-		name = val;
+	private void setValue(String val) {
+		value = val;
 	}
 
 	@Override
 	public String toString() {
-		return "Label [" + name + "]";
+		return "Label [" + value + "]";
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((value == null) ? 0 : value.hashCode());
 		return result;
 	}
 
@@ -44,15 +43,15 @@ public class Label implements Serializable, Comparable<Label> {
 		if (getClass() != obj.getClass())
 			return false;
 		Label other = (Label) obj;
-		if (name == null) {
-			if (other.name != null)
+		if (value == null) {
+			if (other.value != null)
 				return false;
-		} else if (!name.equals(other.name))
+		} else if (!value.equals(other.value))
 			return false;
 		return true;
 	}
 
 	public int compareTo(Label anotherLabel) {
-		return name.compareTo(anotherLabel.getName());
+		return value.compareTo(anotherLabel.getValue());
 	}	
 }

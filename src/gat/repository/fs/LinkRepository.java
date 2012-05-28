@@ -1,39 +1,25 @@
 package gat.repository.fs;
 
-import java.io.IOException;
-import java.nio.file.Files;
+import gat.workspace.Hash;
+
 import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 
-import gat.repository.Repository;
-import gat.repository.RepositoryException;
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
-public class LinkRepository extends BaseRepository implements Repository<FileAsset> {
+public class LinkRepository extends BaseRepository {
 
-	public LinkRepository(Path assetDirectory) {
+	@Inject
+	LinkRepository(@Named("AssetDirectory") Path assetDirectory) {
 		super(assetDirectory);
+		// TODO Auto-generated constructor stub
 	}
 
 	@Override
-	public FileAsset store(Path path) throws RepositoryException, IOException {
-		FileAsset asset = newAsset(path);
-		Path assetPath = asset.getPath();
-		Files.createDirectories(assetPath.getParent());
-		Files.createLink(assetPath, path);
-		return asset;
-	}
-
-	@Override
-	public void attach(Path path, FileAsset asset) throws RepositoryException,
-			IOException {
-		Files.createDirectories(path.getParent());
-		Files.createLink(path, asset.getPath());
-	}
-
-	@Override
-	protected boolean isAttachedInner(Path path, FileAsset asset)
-			throws IOException {
+	protected LinkAsset newAsset(Path path, Hash name, BasicFileAttributes attr) {
 		// TODO Auto-generated method stub
-		return Files.isSameFile(path, asset.getPath());
+		return new LinkAsset(path, name, attr.size());
 	}
 
 }

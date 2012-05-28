@@ -1,4 +1,4 @@
-package gat.database;
+package gat.workspace;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -7,18 +7,18 @@ import java.util.Set;
 
 import com.google.common.collect.Lists;
 
-public class Link implements Serializable {
+class Bond implements Serializable {
 	private static final long serialVersionUID = 1L;
-	private final Name name;
+	private final Hash hash;
 	private final Set<Label> labels;
 	
-	public Link(Name name) {
+	Bond(Hash hash) {
 		this.labels = new HashSet<Label>();
-		this.name   = name;
+		this.hash   = hash;
 	}
 
-	public Name getName() {
-		return name;
+	public Hash getHash() {
+		return hash;
 	}
 
 	/**
@@ -26,17 +26,16 @@ public class Link implements Serializable {
 	 *
 	 * @return The labels.
 	 */
-	public List<Label> getLabels()
+	List<Label> getLabels()
 	{
 		return Lists.newLinkedList(labels);
 	}
 
-	
-	public void addLabel(Label label) {
+	void addLabel(Label label) {
 		this.labels.add(label);
 	}
 
-	public void removeLabel(Label label) {
+	void removeLabel(Label label) {
 		this.labels.remove(label);
 	}
 	

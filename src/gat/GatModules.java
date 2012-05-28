@@ -1,8 +1,8 @@
 package gat;
 
 import gat.config.ConfigModule;
-import gat.database.DatabaseModule;
 import gat.repository.fs.FileRepositoryModule;
+import gat.workspace.DatabaseModule;
 
 import com.google.inject.AbstractModule;
 

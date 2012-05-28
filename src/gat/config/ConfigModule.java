@@ -2,19 +2,30 @@ package gat.config;
 
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
-import java.util.ArrayList;
+import java.text.DateFormat;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.name.Named;
-import com.google.inject.name.Names;
 
 public class ConfigModule extends AbstractModule {
-	
-
 	@Override
 	protected void configure() {
-		bind(Config.class);
+		// TODO
+	}
+	
+	@Provides
+	Gson getGson() {
+		 Gson gson = new GsonBuilder()
+	     .serializeNulls()
+	     .setDateFormat(DateFormat.LONG)
+	     .setPrettyPrinting()
+	     .setVersion(1.0)
+	     .create();
+		 
+		 return gson;
 	}
 	
 	@Provides @Named("UserDirectory")
@@ -22,8 +33,5 @@ public class ConfigModule extends AbstractModule {
 		return FileSystems.getDefault().getPath(System.getProperty("user.dir"));
 	}
 	
-	@Provides @Named("BaseDirectory")
-	Path getBaseDirectory(Config config) {
-		return config.getBaseDirectory();
-	}
+
 }	
